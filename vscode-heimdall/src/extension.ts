@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import {autoCompleteTrigger } from './tracker';
+import {autoCompleteTrigger, monitorModifiedLines } from './tracker';
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
@@ -11,6 +11,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("heimdall.evaluateUse", () => {
             autoCompleteTrigger(context);
         })
+    );
+    context.subscriptions.push(
+        monitorModifiedLines()
     );
 }
 export function deactivate() { }
