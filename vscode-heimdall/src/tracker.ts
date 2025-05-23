@@ -6,7 +6,7 @@ let trackedInsertions: Record<string, string> = {};
 
 // TEMPORARY DEFINITIONS - TESTING PURPOSES
 const SERVER_ADDRESS = 'localhost:50051';
-const PROTO_PATH = './network/metric.proto';
+const PROTO_PATH = 'C:\\Users\\Admin\\Desktop\\Projects\\heimdall\\vscode-heimdall\\src\\network\\metric.proto';
 const PACKAGE_NAME = 'heimdall';
 const SERVICE_NAME = 'metricService';
 const METHOD_NAME = 'SendMetric';
