@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package heimdall;
+
+service metricService {
+    rpc SendMetric (MetricRequest) returns (MetricResponse);
+}
+
+message MetricRequest {
+    string eventType = 1;
+    string data = 2; // You can use JSON string for arbitrary data
+}
+
+message MetricResponse {
+    string status = 1;
+    string message = 2;
+}

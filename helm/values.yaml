@@ -1,0 +1,32 @@
+# Default values for heimdall-stack.
+replicaCount: 1
+
+image:
+  repository: heimdall-bifrost
+  tag: latest
+
+grpc:
+  repository: heimdall-grpc
+  tag: latest
+
+db:
+  repository: scylladb/scylla
+  tag: 5.4
+  pullPolicy: IfNotPresent
+  clusterName: heimdall-cluster
+  dc: dc1
+  rack: rack1
+  resources: {}
+
+service:
+  type: ClusterIP
+  port: 8000
+
+grpcService:
+  type: ClusterIP
+  port: 50051
+
+dbService:
+  type: ClusterIP
+  port: 9042
+

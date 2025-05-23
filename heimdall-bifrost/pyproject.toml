@@ -1,0 +1,27 @@
+[project]
+name = "heimdall-bifrost"
+version = "0.1.0"
+description = "An Observability Platform to Monitor GitHub Copilot Heuristics for Quantifying AI Productivity Impact"
+readme = "README.md"
+authors = [
+    { name = "Pang Jun Rong" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "cassandra-driver>=3.29.2",
+    "fastapi>=0.115.12",
+    "grpcio>=1.71.0",
+    "grpcio-tools>=1.71.0",
+    "loguru>=0.7.3",
+    "ruff>=0.11.11",
+    "uvicorn>=0.34.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]

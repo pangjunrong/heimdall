@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
-import {autoCompleteTrigger, monitorModifiedLines } from './tracker';
+import { initializeAPIClient, autoCompleteTrigger, monitorModifiedLines } from './tracker';
 
 export function activate(context: vscode.ExtensionContext) {
+    initializeAPIClient();
+
     context.subscriptions.push(
         vscode.commands.registerCommand("heimdall.startExtension", () => {
             vscode.window.showInformationMessage("Heimdall is now ready to start tracking heuristics.");
@@ -16,4 +18,5 @@ export function activate(context: vscode.ExtensionContext) {
         monitorModifiedLines()
     );
 }
+
 export function deactivate() { }

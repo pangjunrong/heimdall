@@ -1,16 +1,25 @@
 import * as vscode from 'vscode';
-import GrpcProducer from './network/producer'; // Adjust the import path as needed
+import APIClient from './network/client';
 
+let apiClient: APIClient;
 let trackedInsertions: Record<string, string> = {};
 
-// gRPC configuration (update these values as needed)
+// TEMPORARY DEFINITIONS - TESTING PURPOSES
 const SERVER_ADDRESS = 'localhost:50051';
-const PROTO_PATH = 'path/to/your.proto';
-const PACKAGE_NAME = 'yourPackageName';
-const SERVICE_NAME = 'yourServiceName';
-const METHOD_NAME = 'SendMetric'; // The RPC method name
+const PROTO_PATH = './network/metric.proto';
+const PACKAGE_NAME = 'heimdall';
+const SERVICE_NAME = 'metricService';
+const METHOD_NAME = 'SendMetric';
 
-const grpcProducer = GrpcProducer.getInstance(SERVER_ADDRESS, PROTO_PATH, PACKAGE_NAME, SERVICE_NAME);
+export function initializeAPIClient() {
+    try {
+        apiClient = APIClient.getInstance(SERVER_ADDRESS, PROTO_PATH, PACKAGE_NAME, SERVICE_NAME);
+        vscode.window.showInformationMessage('✅ gRPC Client Initialized Successfully');
+    } catch (error) {
+        console.error('❌ Failed to Initialize gRPC Client:', error);
+        vscode.window.showInformationMessage(`Failed to Initialize gRPC Client: ${error}`);
+    }
+}
 
 // This wrapper method is called when the user triggers the auto-complete action from GitHub Copilot
 export async function autoCompleteTrigger(context: vscode.ExtensionContext) {
@@ -71,18 +80,25 @@ async function evaluateUse(startLine: number | undefined, endLine: number | unde
             startLine: startLine !== undefined ? startLine + 1 : undefined,
             endLine: endLine !== undefined ? endLine + 1 : undefined,
             textBetween,
-            timestamp: new Date().toLocaleString()
+            timestamp: new Date().toISOString()
         });
     }
 }
 
 async function sendMetric(eventType: string, data: any = null) {
     try {
-        await grpcProducer.sendMessage(METHOD_NAME, {
+        console.log(`📤 Sending Metric: ${eventType}`);
+        console.log(`📊 Data:`, data);
+
+        const response = await apiClient.sendMessage(METHOD_NAME, {
             eventType,
-            data
+            data: JSON.stringify(data)
         });
+
+        console.log('📥 gRPC Response:', response);
+        vscode.window.showInformationMessage(`Metric Sent: ${eventType}`);
     } catch (error) {
-        vscode.window.showErrorMessage(`Failed to send metric: ${error}`);
+        console.error('❌ gRPC Error:', error);
+        vscode.window.showErrorMessage(`Failed to Send Metric: ${error}`);
     }
 }
