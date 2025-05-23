@@ -1,10 +1,19 @@
 import * as vscode from 'vscode';
+import GrpcProducer from './network/producer'; // Adjust the import path as needed
 
 let trackedInsertions: Record<string, string> = {};
 
- // This wrapper method is called when the user triggers the auto-complete action from GitHub Copilot
+// gRPC configuration (update these values as needed)
+const SERVER_ADDRESS = 'localhost:50051';
+const PROTO_PATH = 'path/to/your.proto';
+const PACKAGE_NAME = 'yourPackageName';
+const SERVICE_NAME = 'yourServiceName';
+const METHOD_NAME = 'SendMetric'; // The RPC method name
+
+const grpcProducer = GrpcProducer.getInstance(SERVER_ADDRESS, PROTO_PATH, PACKAGE_NAME, SERVICE_NAME);
+
+// This wrapper method is called when the user triggers the auto-complete action from GitHub Copilot
 export async function autoCompleteTrigger(context: vscode.ExtensionContext) {
-    // We track the before & after caret position to determine the range of text that was auto-completed
     const editor = vscode.window.activeTextEditor;
     const start = editor ? editor.selection.start : undefined;
     await vscode.commands.executeCommand('editor.action.inlineSuggest.commit');
@@ -26,7 +35,6 @@ export function monitorModifiedLines() {
         const editor = event.textEditor;
         const currentLine = editor.selection.active.line;
 
-        // Check if the last line was tracked and has changed
         if (
             lastLine !== undefined &&
             trackedInsertions[lastLine] !== undefined &&
@@ -35,11 +43,10 @@ export function monitorModifiedLines() {
             if (timeouts[lastLine]) {
                 clearTimeout(timeouts[lastLine]);
             }
-            // Use a closure to capture the correct line number
             const lineToCheck = lastLine;
             timeouts[lineToCheck] = setTimeout(() => {
                 const lineText = editor.document.lineAt(lineToCheck).text;
-                logMetric("There was change detected on a generated line.", { line: lineToCheck, lineText });
+                sendMetric("There was change detected on a generated line.", { line: lineToCheck, lineText });
                 delete timeouts[lineToCheck];
                 delete trackedInsertions[lineToCheck];
             }, 5000);
@@ -50,7 +57,6 @@ export function monitorModifiedLines() {
 }
 
 async function evaluateUse(startLine: number | undefined, endLine: number | undefined, textBetween: string) {
-    // We split the text into lines and track the insertions
     if (typeof startLine === 'number' && typeof endLine === 'number' && textBetween) {
         const newlineMatch = textBetween.match(/\r\n|\n|\r/);
         const newline = newlineMatch ? newlineMatch[0] : '\n';
@@ -59,13 +65,9 @@ async function evaluateUse(startLine: number | undefined, endLine: number | unde
             const lineNumber = startLine + i;
             trackedInsertions[lineNumber] = splitLines[i];
         }
-
-        console.log("The tracked insertions are:", {
-            trackedInsertions
-        });
     }
     if (textBetween) {
-        logMetric("Auto-Complete Triggered!", {
+        await sendMetric("Auto-Complete Triggered!", {
             startLine: startLine !== undefined ? startLine + 1 : undefined,
             endLine: endLine !== undefined ? endLine + 1 : undefined,
             textBetween,
@@ -74,6 +76,13 @@ async function evaluateUse(startLine: number | undefined, endLine: number | unde
     }
 }
 
-function logMetric(eventType: string, data: any = null) {
-    vscode.window.showInformationMessage(`Event: ${eventType}, Data: ${JSON.stringify(data)}`);
+async function sendMetric(eventType: string, data: any = null) {
+    try {
+        await grpcProducer.sendMessage(METHOD_NAME, {
+            eventType,
+            data
+        });
+    } catch (error) {
+        vscode.window.showErrorMessage(`Failed to send metric: ${error}`);
+    }
 }
