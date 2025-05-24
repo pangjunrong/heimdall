@@ -1,0 +1,28 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "extension-setup",
+            "dependsOrder": "sequence",
+            "dependsOn": ["install", "compile"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "install",
+            "type": "npm",
+            "script": "install",
+            "path": "vscode-heimdall",
+            "problemMatcher": []
+        },
+        {
+            "label": "compile",
+            "type": "npm",
+            "script": "compile",
+            "path": "vscode-heimdall",
+            "problemMatcher": ["$tsc"]
+        }
+    ]
+}
