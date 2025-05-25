@@ -1,0 +1,21 @@
+# Dockerfile for gRPC server
+FROM python:3.11-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+WORKDIR /app
+
+# Install Dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-install-project
+
+ADD . /app
+
+# Sync the Project
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked
+
+EXPOSE 50051
+ENV PYTHONPATH=/app/src/heimdall_bifrost
+CMD ["uv", "run", "-m", "src.heimdall_bifrost.listener.grpc_server"]

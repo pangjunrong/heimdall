@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heimdall-grpc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heimdall-grpc
+  template:
+    metadata:
+      labels:
+        app: heimdall-grpc
+    spec:
+      containers:
+        - name: heimdall-grpc
+          image: "{{ .Values.grpc.repository }}:{{ .Values.grpc.tag }}"
+          imagePullPolicy: {{ .Values.grpc.pullPolicy }}
+          ports:
+            - containerPort: 50051
+          env:
+            - name: SCYLLA_HOST
+              value: "heimdall-db"
+            - name: SCYLLA_PORT
+              value: "9042"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: heimdall-grpc
+spec:
+  type: {{ .Values.grpcService.type }}
+  ports:
+    - port: {{ .Values.grpcService.port }}
+      targetPort: 50051
+  selector:
+    app: heimdall-grpc

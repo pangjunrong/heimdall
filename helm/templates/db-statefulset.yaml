@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: heimdall-db
+spec:
+  serviceName: heimdall-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heimdall-db
+  template:
+    metadata:
+      labels:
+        app: heimdall-db
+    spec:
+      containers:
+        - name: scylladb
+          image: "{{ .Values.db.repository }}:{{ .Values.db.tag }}"
+          imagePullPolicy: {{ .Values.db.pullPolicy }}
+          ports:
+            - containerPort: 9042
+            - containerPort: 7000
+            - containerPort: 7001
+            - containerPort: 7199
+            - containerPort: 10000
+          env:
+            - name: SCYLLA_CLUSTER_NAME
+              value: "{{ .Values.db.clusterName }}"
+            - name: SCYLLA_DC
+              value: "{{ .Values.db.dc }}"
+            - name: SCYLLA_RACK
+              value: "{{ .Values.db.rack }}"
+          volumeMounts:
+            - name: scylla-data
+              mountPath: /var/lib/scylla
+      volumes:
+        - name: scylla-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: heimdall-db
+spec:
+  type: {{ .Values.dbService.type }}
+  ports:
+    - port: {{ .Values.dbService.port }}
+      targetPort: 9042
+  selector:
+    app: heimdall-db
