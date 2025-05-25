@@ -4,7 +4,8 @@ version = "0.1.0"
 description = "An Observability Platform to Monitor GitHub Copilot Heuristics for Quantifying AI Productivity Impact"
 readme = "README.md"
 authors = [
-    { name = "Pang Jun Rong" }
+    { name = "Pang Jun Rong" },
+    { name = "Lua Yi Da" }
 ]
 requires-python = ">=3.11"
 dependencies = [
@@ -13,7 +14,9 @@ dependencies = [
     "grpcio>=1.71.0",
     "grpcio-tools>=1.71.0",
     "loguru>=0.7.3",
+    "streamlit>=1.45.1",
     "uvicorn>=0.34.2",
+    "websockets>=15.0.1",
 ]
 
 [dependency-groups]
