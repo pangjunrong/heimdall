@@ -1,0 +1,10 @@
+# Default values for heimdall-grpc
+replicaCount: 1
+grpc:
+  repository: heimdall-grpc
+  tag: latest
+  pullPolicy: IfNotPresent
+grpcService:
+  type: ClusterIP
+  port: 50051
+

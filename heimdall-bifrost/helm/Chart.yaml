@@ -1,0 +1,4 @@
+apiVersion: v2
+name: heimdall-grpc
+version: 0.1.0
+description: A Helm chart for deploying the heimdall gRPC server

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: heimdall-grpc
+spec:
+  type: {{ .Values.grpcService.type }}
+  ports:
+    - port: {{ .Values.grpcService.port }}
+      targetPort: 50051
+  selector:
+    app: heimdall-grpc

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: heimdall-grpc
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: heimdall-grpc
@@ -18,20 +18,3 @@ spec:
           imagePullPolicy: {{ .Values.grpc.pullPolicy }}
           ports:
             - containerPort: 50051
-          env:
-            - name: SCYLLA_HOST
-              value: "heimdall-db"
-            - name: SCYLLA_PORT
-              value: "9042"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: heimdall-grpc
-spec:
-  type: {{ .Values.grpcService.type }}
-  ports:
-    - port: {{ .Values.grpcService.port }}
-      targetPort: 50051
-  selector:
-    app: heimdall-grpc
