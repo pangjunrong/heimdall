@@ -4,6 +4,22 @@ from listener import metric_pb2, metric_pb2_grpc
 from loguru import logger
 import signal
 import sys
+import os
+import sqlite3
+
+# TODO: Find a better place to initialize the SQLite DB
+# SQLite setup (persistent, WAL mode)
+SQLITE_DB_PATH = os.path.join(os.path.dirname(__file__), '../db/metrics.sqlite3')
+os.makedirs(os.path.dirname(SQLITE_DB_PATH), exist_ok=True)
+conn = sqlite3.connect(SQLITE_DB_PATH, check_same_thread=False)
+conn.execute('PRAGMA journal_mode=WAL;')
+conn.execute('''
+CREATE TABLE IF NOT EXISTS metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_type TEXT,
+    data TEXT
+)
+''')
 
 
 class MetricService(metric_pb2_grpc.metricServiceServicer):
@@ -25,11 +41,12 @@ class MetricService(metric_pb2_grpc.metricServiceServicer):
         try:
             logger.info("Received Metric: {}", request.eventType)
             logger.debug("Data: {}", request.data)
-            
-            # TODO: Ingest Data to ScyllaDB
-
+            # Ingest Data to SQLite
+            # TODO: The data is stored as serialized JSON, consider how we want to store the actual data (as well as what data we want to store)
+            conn.execute('INSERT INTO metrics (event_type, data) VALUES (?, ?)', (request.eventType, request.data))
+            conn.commit()
             return metric_pb2.MetricResponse(
-                status="success", message=f"Metric received: {request.eventType}"
+                status="success", message=f"Metric received and stored: {request.eventType}"
             )
         except Exception as e:
             logger.exception("⚠️ Error Processing Metric!")
