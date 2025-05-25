@@ -43,7 +43,6 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
     "@types/vscode": "^1.100.0",
@@ -58,18 +57,5 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.13.4"
-=======
-    "@types/vscode": "^1.100.0",
-    "@types/mocha": "^10.0.10",
-    "@types/node": "20.x",
-    "@typescript-eslint/eslint-plugin": "^8.31.1",
-    "@typescript-eslint/parser": "^8.31.1",
-    "eslint": "^9.25.1",
-    "esbuild": "^0.25.3",
-    "npm-run-all": "^4.1.5",
-    "typescript": "^5.8.3",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.5.2"
->>>>>>> 3f160f910e770c54e0582b6ffeb281b7dc6962ae
   }
 }
